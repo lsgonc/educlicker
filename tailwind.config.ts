@@ -19,7 +19,7 @@ const config: Config = {
         "comp_default": "#D9E0D4",
         "black": "#000",
         "white": "#fff"
-      }
+      },
     },
   },
   plugins: [],
