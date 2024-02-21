@@ -1,10 +1,11 @@
-export default function Button(props)
+export default function Button(props: {text: string})
 {
     return(
-        <button>
-            <div className="bg-bg_default px-10 py-4 rounded-md text-white">
-            <p>{props.button_text}</p>
-            </div>
-        </button>
+      <button className="bg-[#212634] my-4 w-80 h-16 rounded-3xl">
+        <h1 className="text-white">{props.text}</h1>
+      </button>
     );
 }
+/*
+Botão à ser
+*/
