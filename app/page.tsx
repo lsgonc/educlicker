@@ -8,9 +8,11 @@ export default function Home() {
   return (
     <>
     <Navbar />
+    <main>
     <Slider />
     <Wrapper text="Entrar em uma sala? Digite o PIN" button_text="Entrar na sala"/>
     <Wrapper text="É professor? Crie sua sala personalizada!" button_text="Criar sala"/>
+    </main>
     <Footer />
     </>
   );
