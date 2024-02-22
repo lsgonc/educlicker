@@ -16,3 +16,7 @@ export default function Navbar()
         </>
     );
 }
+/*
+<input type={props.tipo_input} className={`${props.color} my-4 w-80 h-16 rounded-3xl text-center text-white`} placeholder={props.text} value={props.valor} />
+    );
+*/
