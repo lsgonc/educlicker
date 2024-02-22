@@ -25,7 +25,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-br">
-      <body className="bg-bg_default {roboto.className}">{children}</body>
+      <body className="bg-bg_default {roboto.className}">
+        {children}
+      </body>
     </html>
   );
 }
