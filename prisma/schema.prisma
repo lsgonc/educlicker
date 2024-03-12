@@ -1,0 +1,22 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type QuizzesQuestions {
+  id              Int
+  question        String
+  respostaCorreta String
+  respostas       String[]
+}
+
+model quizzes {
+  id          String             @id @default(auto()) @map("_id") @db.ObjectId
+  autor       String
+  dataCriacao DateTime           @db.Date
+  questions   QuizzesQuestions[]
+}

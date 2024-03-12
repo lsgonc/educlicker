@@ -8,6 +8,21 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        inter: ['var(--font-inter)'],
+        roboto: ['var(--font-roboto)'],
+        anton: ['var(--font-anton)']
+      },
+      variants: {
+        extend: {
+          opacity: ['disabled'],
+          border: ['disabled'],
+          bg: ['disabled'],
+          hover: ['disabled']
+          // add any tailwind classes you wish to enable disabled: on here  
+        }
+      },
+        
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
@@ -18,10 +33,15 @@ const config: Config = {
         "bg_dark": "#212634",
         "comp_default": "#D9E0D4",
         "black": "#000",
-        "white": "#fff"
+        "white": "#fff",
+        "green": "#03fc07",
+        "red": "#FF0000",
       },
     },
+    
   },
-  plugins: [],
+  plugins: [
+    require('tailwindcss-animated')
+  ],
 };
 export default config;
