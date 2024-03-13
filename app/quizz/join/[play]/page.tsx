@@ -10,6 +10,7 @@ import { CountdownCircleTimer } from "react-countdown-circle-timer";
 import { Socket, io } from "socket.io-client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getServerSideProps, getStaticProps } from "next/dist/build/templates/pages";
+import { FaUser } from "react-icons/fa";
 import useSWR from "swr";
 import Chat from "@/components/Chat";
 
@@ -48,6 +49,10 @@ export default function Page({params} : {params : {id:string}})
 
     const [connectedPlayers, setConnectedPlayer] = useState(1)
 
+    const [shuffled, setShuffled] = useState(0)
+
+    const [timer, setTimer] = useState() //sincronizar o timer com o server-side
+
 
     let user = "anonimo"
 
@@ -84,8 +89,6 @@ export default function Page({params} : {params : {id:string}})
         socket.on("troca-questao", (res) => {
             setAtiva((e) => res.gameActiveQuestion) //passa pra proxima
             setDisable((e) => 0) //reativa o botao
-            
-            
         })
 
         //server emite => quiz acabou => client manda os resultados
@@ -108,6 +111,7 @@ export default function Page({params} : {params : {id:string}})
             setUpdate((e) => data.gameTimer)
             setAtiva((e) => data.gameActiveQuestion)
             setConnectedPlayer((e) => data.connectedPlayers)
+            setTimer((e) => data.gameTimer)
             console.log("game ta sendo uptadted")
         })
 
@@ -157,9 +161,10 @@ export default function Page({params} : {params : {id:string}})
     useEffect(() => {
         setCorreta((e)=>!e)
         if(data)
-            setAtual((e) => data[0].questions[questaoAtiva])
+            setAtual((e) => data[0].questions[questaoAtiva]) //seta a questao atual 
     },[questaoAtiva])
 
+    //Lógica para verificar se a resposta está correta => é chamado sempre q o usuario clica no botão e altera o estado da variavel "choice"
     useEffect(() => {
         if(choice === atual?.respostaCorreta){
             setResultado((prev) => {
@@ -173,12 +178,23 @@ export default function Page({params} : {params : {id:string}})
     useEffect(() => {
         console.log(timerUpdate)
         socket?.emit("timer-atualizou",timerUpdate)
-    }, [timerUpdate])
+    }, [timerUpdate]) 
 
+    //Seta a questão atual pra assim q carrega do banco de dados o quiz
     useEffect(() => {
         if(data)
             setAtual((e) => data[0].questions[questaoAtiva])
     },[data])
+
+
+    //Cria um array embaralhado, para os botões não ficarem sempre na mesma posição
+    useEffect(() => {
+        if(atual){
+            console.log("Atual",atual)
+            setShuffled((prev) => atual.respostas.sort((a, b) => 0.5 - Math.random()))
+            console.log("Shuffled: ", shuffled)
+        }
+    }, [atual])
 
     useEffect(() => {
         //emitir o score só uma vez => quando o quiz tiver acabado
@@ -228,13 +244,38 @@ export default function Page({params} : {params : {id:string}})
         //É O HOST => FORNECE AS OPÇÕES PARA CONTROLAR O QUIZ
         if(!iniciar){
         return(
-            <main className="w-full h-screen flex flex-col justify-center items-center gap-3 bg-[#bcc2b8] p-5">
-                <h1>VOCE É O HOST</h1>
-                <button disabled={(connectedPlayers>=2) ? false : true} onClick={initQuiz}  className="relative flex h-[50px] w-40 items-center rounded-md justify-center overflow-hidden bg-bg_default text-white shadow transition-all before:absolute before:h-0 before:w-0 before:rounded-full before:bg-bg_dark before:duration-500 before:ease-out hover:shadow-bg_dark hover:before:h-56 hover:before:w-56">
-                <span className="relative z-10">Iniciar Quiz</span>
-                </button>
-                <h2 className="text-lg font-bold">Compartilhe o GAME PIN: {gamePin}</h2>
-                <h3>Players online: {connectedPlayers}</h3>
+            <main className="w-full h-screen font-roboto flex flex-col justify-between items-center gap-32 bg-[#76ABAE] p-5">
+                <div className="flex justify-center w-full ">
+                    <div className="polygon-1 justify-center p-12 items-center bg-white flex w-1/4 h-24 rounded-md shadow-lg">
+                        <h1 className="">Entre em <strong>www.educlicker.com/quiz</strong></h1>
+                    </div>
+                    <div className="polygon-2 justify-center bg-white flex flex-col w-1/4 h-24 rounded-lg shadow-lg">
+                        <span className="text-sm text-left text-center">Game pin: <br /></span>
+                        <span className="self-center text-xl"><strong>{gamePin}</strong></span>
+                    </div>
+                </div>
+                <div className="flex flex-col items-center gap-10">
+                    <div>
+                        <h1 className="text-4xl text-center font-bold">VOCE É O HOST</h1>
+                        {(connectedPlayers>=2) 
+                        ?
+                            <span>Jogadores já conectaram! Inicie quando quiser!</span>
+                         : 
+                            <span>Aguarde pelos menos mais um jogador para iniciar o jogo!</span>
+                         } 
+                        
+                        </div>
+                    <div className="flex flex-col gap-4">
+                        <button disabled={(connectedPlayers>=2) ? false : true} onClick={initQuiz}  className="relative flex h-[50px] w-40 items-center rounded-md justify-center overflow-hidden bg-bg_default text-white shadow transition-all before:absolute before:h-0 before:w-0 before:rounded-full before:bg-bg_dark before:duration-500 before:ease-out hover:shadow-bg_dark hover:before:h-56 hover:before:w-56">
+                            <span className="relative z-10">Iniciar Quiz</span>
+                        </button>
+                    </div>
+                </div>
+                <div className="flex bg-[#31363F] py-2 px-4  rounded-md opacity-80 justify-center gap-3">
+                    <FaUser className="fill-white" size={30}/>
+                    <h3 className="text-white">{connectedPlayers}</h3>
+                </div>
+                
             </main>
         )    
         }
@@ -243,7 +284,7 @@ export default function Page({params} : {params : {id:string}})
         if(!iniciar)
         {
             return (
-                <main className="w-full h-screen flex flex-col justify-center items-center gap-3 bg-[#bcc2b8] p-5">
+                <main className="w-full h-screen flex flex-col justify-center items-center gap-3 bg-[#76ABAE] p-5">
                 <button disabled={true} className="relative flex h-[50px] w-40 items-center rounded-md justify-center overflow-hidden bg-bg_default text-white shadow transition-all before:absolute before:h-0 before:w-0 before:rounded-full before:bg-bg_dark before:duration-500 before:ease-out hover:shadow-bg_dark hover:before:h-56 hover:before:w-56">
                 <span className="relative z-10">Aguarde o HOST iniciar o jogo!</span>
                 </button>
@@ -253,8 +294,6 @@ export default function Page({params} : {params : {id:string}})
         }
 
     }
-
-    
     
     
       if(acabou){
@@ -284,6 +323,7 @@ export default function Page({params} : {params : {id:string}})
             <main className="w-full h-80 mb-32 flex items-center justify-between gap-10">
             <CountdownCircleTimer
                 isPlaying
+                
                 initialRemainingTime={timerUpdate}
                 duration={20}
                 size={100}
@@ -300,10 +340,10 @@ export default function Page({params} : {params : {id:string}})
                     
                     
                     
-                    return { shouldRepeat: true, delay: 0.5}
-                  }}
+                    return { shouldRepeat: true}
+                  }}        
             >
-                {({ remainingTime }) => remainingTime}
+                {({ remainingTime }) => remainingTime=timer}
             </CountdownCircleTimer>
             <div className=" bg-[#bcc2b8] h-full flex flex-col gap-2 justify-center items-center px-10">
             <span className="self-start font-bold">Acertos: {resultado.totalAcertos}</span>
@@ -318,8 +358,8 @@ export default function Page({params} : {params : {id:string}})
             
             <aside className="w-full bg-comp_default grid grid-cols-2 gap-5 max-sm:grid-cols-1">
                 {//Gerando os botoes para cada resposta
-                atual.respostas.map((res,index) => (
-                <button key={index} id={res} disabled={btnDisable} onClick={handleClick} className={`${btnSelectedId == res ? 'opacity-50' : ''} ${(res===atual.respostaCorreta) && mostrarCorreta ? 'bg-green' : 'bg-bg_dark'} relative p-5 text-white w-25 rounded-md justify-center  ${btnDisable ? '' : 'hover:bg-[#bcc2b8]'}`} type="button">{res}</button>
+                shuffled.map((res,index) => (
+                    <button key={index} id={res} disabled={btnDisable} onClick={handleClick} className={`${btnSelectedId == res ? 'opacity-50' : ''} ${(choice===atual.respostaCorreta && btnSelectedId==res) ? 'bg-green' : ''} ${(choice!=atual.respostaCorreta && btnSelectedId==res) ? 'bg-red' : ''}  bg-bg_dark relative p-5 text-white w-25 rounded-md justify-center  ${btnDisable ? '' : 'hover:bg-[#bcc2b8]'}`} type="button">{res}</button>
                 ))
                 }
                 

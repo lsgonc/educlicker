@@ -5,7 +5,7 @@ import {InView} from "react-intersection-observer"
 interface ScrollAnimationProps {
     children: ReactNode,
     inViewClass: string,
-    outViewClass: boolean,
+    outViewClass: string,
     threshold: number,
     triggerOnce: boolean
 }

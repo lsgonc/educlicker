@@ -53,10 +53,16 @@ export default function Home() {
   </div>
     </aside>
     <Explore text="Depoimentos" />
-    <section className="mt-10 depoimentos px-32 flex flex gap-10 mb-32">
-      <Card></Card>
-      <Card></Card>
-      <Card></Card>
+    <section className="mt-10 depoimentos px-32 sm:flex  gap-10 mb-32 max-sm:flex-col">
+      <ScrollAnimation inViewClass="animate-fade-right" outViewClass="">      
+        <Card></Card>
+      </ScrollAnimation>
+      <ScrollAnimation inViewClass="animate-fade-right animate-delay-[500ms]" outViewClass="">      
+        <Card></Card>
+      </ScrollAnimation>
+      <ScrollAnimation inViewClass="animate-fade-right animate-delay-[1000ms]" outViewClass="">      
+        <Card></Card>
+      </ScrollAnimation>
     </section>
     <ContactForm />
     <Footer />
