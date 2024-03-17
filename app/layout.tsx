@@ -34,10 +34,10 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
 
-  
-
+  const session = await getServerSession()
   return (
-    <SessionWrapper>
+    
+    <SessionWrapper session={session}>
     <html lang="pt-br">
       <body className={`${roboto.variable} ${inter.variable}`} >
         {children}

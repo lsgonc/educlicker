@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth"
-import prisma from "../route"
+import prisma from "../prisma"
 
 
-export async function DELETE(req)
+export async function DELETE(req : any)
 {
     const searchParams = req.nextUrl.searchParams;
     const id = searchParams.get('id');

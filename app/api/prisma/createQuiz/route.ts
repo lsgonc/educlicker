@@ -1,12 +1,12 @@
 import { NextRequest } from "next/server"
-import prisma from "../route"
+import prisma from "../prisma"
 import { getSession } from "next-auth/react"
 import { getServerSession } from "next-auth"
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
 
-export async function POST(req:NextRequest,res)
+export async function POST(req:NextRequest)
 {
     let {id, author, questions} = await req.json()
 

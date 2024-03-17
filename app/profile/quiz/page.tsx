@@ -1,15 +1,14 @@
 "use client"
 import { getServerSession } from "next-auth"
 import { useSession } from "next-auth/react"
-import prisma from "@/app/api/prisma/route"
-import QuizCard from "@/components/QuizCard"
+import prisma from "@/app/api/prisma/prisma"
 import { quizzes } from "@prisma/client"
 import useSWR from "swr"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
-import { io } from "socket.io-client"
+import { Socket, io } from "socket.io-client"
 
-let socket
+let socket : Socket
 
 async function fetcher()
 {
@@ -35,15 +34,13 @@ export default function Page()
 
     const hostA = (session?.user?.name) ? session?.user.name : "host"
     const [gamePin, setGamePin] = useState(null)
-    const [buttonClicked, setButtonClicked] = useState()
+    const [buttonClicked, setButtonClicked] = useState("")
 
 
     useEffect(() => {
         socket = io("http://localhost:8080")
 
         
-    
-
         return (() => {
             socket.disconnect()
         })
@@ -53,10 +50,10 @@ export default function Page()
         socket?.on("game_criado",(data) => {
             router.push(`/quizz/join/${buttonClicked}?quizId=${data.id}`)
         })
-    },[buttonClicked])
+    },[buttonClicked,router])
 
 
-    async function handleSubmit(e, id:string) {
+    async function handleSubmit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id:string) {
         e.preventDefault()
 
 
@@ -70,7 +67,7 @@ export default function Page()
 
     }
 
-    function handleCreate(e, id: string) {
+    function handleCreate(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: string) {
         e.preventDefault()
         console.log(id)
         setButtonClicked((e) => id)
@@ -113,11 +110,12 @@ export default function Page()
                         
                         <div className="flex flex-col gap-5">
                         {
-                            data.map( (i : quizzes) => (
+                            data.map( (i : quizzes, index: number) => (
                                 <>
+                                {console.log(`i[${index}] = `,i)}
                                 <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow">
                                     <a href="#">
-                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">{i.questions[0].question}</h5>
+                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">{i.questions[0]?.question}</h5>
                                     </a>
                                     <p className="mb-3 font-normal text-gray-700">{i.autor}</p>
                                     <div className="flex gap-3">

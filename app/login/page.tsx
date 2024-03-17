@@ -2,7 +2,7 @@
 
 import Input from "@/components/Input"
 import { signIn, useSession } from "next-auth/react";
-import { useState } from "react";
+import { MouseEventHandler, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { FaGithub } from "react-icons/fa";
 import { useRouter } from "next/navigation";
@@ -14,27 +14,29 @@ export default function Login() {
 
     const [visiblePassword, setVisiblePassword] = useState(false)
 
-    function toogleVisibility(ev)
+    function toogleVisibility(ev:React.MouseEvent<HTMLButtonElement, MouseEvent>)
     {
         ev.preventDefault()
         setVisiblePassword((e) => !e )
     }
 
 
-    if(!session)
-       {}
+    if(session)
+    {
+        router.push("/")
+    }
     else
         return (
             <div className="font-roboto flex justify-center items-center w-screen h-screen bg-[#76ABAE]">
                 <div className="shadow-lg w-full md:w-1/2 md:h-3/4 max-md:py-10 px-10 shadow lg:px-40 rounded-lg bg-[#fff] flex flex-col justify-center gap-5">
                     <h1 className="text-4xl text-center mb-4">Login</h1>
                     <form className="flex flex-col gap-5" action="">
-                    <input placeholder="Digite seu nome" className="text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3 " type="text" name="" id="" />
+                    <input key={"name"} placeholder="Digite seu nome" className="text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3 " type="text" name="" id="" />
                     <div className="relative">
-                        <input placeholder="Digite sua senha" className="w-full text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3 " type={visiblePassword ? "text" : "password"} name="" id="" />
+                        <input key={"password"} placeholder="Digite sua senha" className="w-full text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3 " type={visiblePassword ? "text" : "password"} name="" id="" />
                             <button
                             className="absolute inset-y-0 right-0 flex items-center px-4 text-gray-600"
-                            onClick={toogleVisibility}
+                            onClick={(e) => toogleVisibility(e)}
                         >
                             {visiblePassword ? (
                             <svg

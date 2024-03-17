@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth"
-import prisma from "../route"
+import prisma from "../prisma"
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 1
@@ -17,7 +17,7 @@ export async function GET()
     return res
 }
 
-export async function POST(req)
+export async function POST(req : any)
 {
     const body = await req.json()
     

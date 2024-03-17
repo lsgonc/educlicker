@@ -1,30 +1,40 @@
 "use client"
 import { useSession } from "next-auth/react";
-import { useState } from "react";
+import { ChangeEvent, ChangeEventHandler, FormEvent, useState } from "react";
 
+
+interface initialQuestion {
+    id: number,
+    question: string,
+    respostaCorreta: string,
+    respostas: string[] 
+}
+
+type Questions = initialQuestion[];
 
 export default function Page() {
     
     const {data: session, status} = useSession() //pra verificar se o usuario ta logado
-    const [nextId, setNextId] = useState(1);
+    const [nextId, setNextId] = useState<number>(1);
 
-    const initialQuestion = {
+    const initialQuestion : initialQuestion = {
         id: nextId,
         question: '',
         respostaCorreta: '',
-        respostas: ['', '', ''] // Initialize with three empty strings
+        respostas: ['','',''] // Initialize with three empty strings
     };
 
-    const [questions, setQuestions] = useState([initialQuestion]);
+    const [questions, setQuestions] = useState<Questions>([initialQuestion]);
 
-    const handleChange = (e, index) => {
+    const handleChange = (e:ChangeEvent<HTMLInputElement>, index:number) => {
         const { name, value } = e.target;
-        const updatedQuestions = [...questions];
-        updatedQuestions[index][name] = value;
+        const updatedQuestions = [...questions as any];
+        const propName = name as keyof initialQuestion;
+        updatedQuestions[index][propName]  = value;
         setQuestions(updatedQuestions);
     };
 
-    const handleWrongAnswerChange = (index, subIndex, value) => {
+    const handleWrongAnswerChange = (index:number, subIndex:number, value: any) => {
         const updatedQuestions = [...questions];
         updatedQuestions[index].respostas[subIndex] = value;
         setQuestions(updatedQuestions);
@@ -35,13 +45,13 @@ export default function Page() {
         setQuestions([...questions, { ...initialQuestion, id: nextId }]);    
     };
 
-    const removeQuestion = (index) => {
+    const removeQuestion = (index:number) => {
         const updatedQuestions = [...questions];
         updatedQuestions.splice(index, 1);
         setQuestions(updatedQuestions);
     };
 
-    const handleSubmit = async (e) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const updatedQuestions = questions.map(question => ({
