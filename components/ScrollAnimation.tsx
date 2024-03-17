@@ -6,14 +6,12 @@ interface ScrollAnimationProps {
     children: ReactNode,
     inViewClass: string,
     outViewClass: string,
-    threshold: number,
-    triggerOnce: boolean
 }
 
-export default function ScrollAnimation({children, inViewClass, outViewClass, threshold, triggerOnce} : ScrollAnimationProps)
+export default function ScrollAnimation({children, inViewClass, outViewClass} : ScrollAnimationProps)
 {
     return (
-        <InView triggerOnce={triggerOnce} threshold={threshold}>
+        <InView triggerOnce={true} threshold={0.6}>
             { ({inView, ref, entry}) => (
                 <div ref={ref} className={inView ? inViewClass : outViewClass}>
                     {children}

@@ -23,9 +23,9 @@ export default function ChatBox() {
     }
     */
 
-    const handleFormSubmission = (event) => {
+    const handleFormSubmission = (event: any ) => {
         event.preventDefault();
-        sendChatMessage(messageText);
+        //sendChatMessages(messageText);
       }
 
 

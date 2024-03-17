@@ -1,6 +1,10 @@
 import ScrollAnimation from "./ScrollAnimation";
 
-export default function Page(props)
+interface ExploreProps {
+    text: string
+}
+
+export default function Page(props: ExploreProps)
 {
 
     return (

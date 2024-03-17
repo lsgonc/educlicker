@@ -9,7 +9,7 @@ export default function Page(){
                 <label className="text-xl" htmlFor="">Email: </label>
                 <input placeholder="Digite seu email" className="text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3 " type="email" name="" id="" />
                 <label className="text-xl" htmlFor="">Mensagem: </label>
-                <textarea placeholder="Deixe sua mensagem" className="text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3 " name="" id="" cols="30" rows="10"></textarea>
+                <textarea placeholder="Deixe sua mensagem" className="text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3 " name="" id="" cols={30} rows={10}></textarea>
                 <button type="submit" className="self-end flex h-[50px] w-full items-center rounded-md justify-center bg-[#76ABAE] ">
                     <span className="">Enviar</span>
                 </button>
