@@ -12,7 +12,7 @@ let socket : Socket
 
 async function fetcher()
 {
-    const res = await fetch(`https://${process.env.VERCEL_URL}/api/prisma/getQuiz`, {
+    const res = await fetch(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/prisma/getQuiz`, {
         method: "GET"
     })
 
@@ -57,7 +57,7 @@ export default function Page()
         e.preventDefault()
 
 
-        const res = await fetch(`https://${process.env.VERCEL_URL}/api/prisma/deleteQuiz/?id=${id}`,{
+        const res = await fetch(`https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/prisma/deleteQuiz/?id=${id}`,{
             method: "DELETE"
         })
 

@@ -39,7 +39,7 @@ interface Question {
   let socket: Socket | undefined;
   
   async function fetcher(id: string): Promise<QuizData> {
-    const res = await fetch(`http://localhost:3000/api/prisma/getQuiz/`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/prisma/getQuiz/`, {
       method: "POST",
       body: JSON.stringify({ id: id })
     });
