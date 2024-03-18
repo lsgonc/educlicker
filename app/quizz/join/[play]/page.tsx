@@ -10,7 +10,7 @@ import { Socket, io } from "socket.io-client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getServerSideProps, getStaticProps } from "next/dist/build/templates/pages";
 import { FaUser } from "react-icons/fa";
-import useSWR from "swr";
+import useSWR, { preload } from "swr";
 import Chat from "@/components/Chat";
 
 interface Question {
@@ -19,7 +19,9 @@ interface Question {
     respostas: string[];
   }
   
-  interface QuizData {
+  interface QuizData extends Array<QuizData>{
+    autor: string,
+    dataCriacao: Date,
     id: string;
     questions: Question[];
   }
@@ -52,10 +54,12 @@ interface Question {
   }: {
     params: { id: string };
   }): JSX.Element {
-    const { data, error } = useSWR<QuizData>(
+    const { data, error, isLoading } = useSWR<QuizData>(
       `/api/prisma/getQuiz/id`,
       () => fetcher(params.id)
     );
+
+
   
     const searchParam = useSearchParams();
     const gamePin = searchParam.get("quizId");
@@ -70,7 +74,7 @@ interface Question {
     const [iniciar, setIniciar] = useState<boolean>(false);
     const [acabou, setAcabou] = useState<boolean>(false);
     const [questaoAtiva, setAtiva] = useState<number>(0);
-    const [atual, setAtual] = useState<Question | null>(null);
+    const [atual, setAtual] = useState<Question | null>();
     const [resultado, setResultado] = useState<{
       totalAcertos: number;
       totalErradas: number;
@@ -162,7 +166,7 @@ interface Question {
   
     useEffect(() => {
       setCorreta((e) => !e);
-      if (data) setAtual(data.questions[questaoAtiva]);
+      if (data) setAtual(data[0].questions[questaoAtiva]);
     }, [questaoAtiva]);
   
     useEffect(() => {
@@ -176,7 +180,10 @@ interface Question {
     }, [choice]);
   
     useEffect(() => {
-      if (data) setAtual(data.questions[questaoAtiva]);
+      if (data!=undefined)
+      {
+        setAtual(data[0].questions[questaoAtiva]);
+      }
     }, [data]);
   
     useEffect(() => {
@@ -191,9 +198,11 @@ interface Question {
   
     function initQuiz() {
       console.log("init quiz com pin", gamePin);
-      socket?.emit("start-game", gamePin, data?.questions.length);
-      setIniciar(true);
-      setAtiva(0);
+      if(data){
+        socket?.emit("start-game", gamePin, data[0].questions.length);
+        setIniciar(true);
+        setAtiva(0);
+     }
     }
   
     function handleClick(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
@@ -201,15 +210,18 @@ interface Question {
       setDisable(true);
       setSelected(1);
       setSelectedId(e.currentTarget.id);
-  
-      if (questaoAtiva === (data?.questions.length ?? 0)) setAtiva(0);
+      
+      if(data)
+        if (questaoAtiva === (data[0].questions.length ?? 0)) setAtiva(0);
   
       setChoice(e.currentTarget.id);
     }
   
     if (error) return <h1>Ocorreu um erro</h1>;
-    if (!data) return <h1>Loading</h1>;
+    if (isLoading) return <h1>Loading</h1>;
   
+
+
     if (pinInvalido) {
       return (
         <main className="w-full h-screen font-roboto flex flex-col justify-center items-center bg-[#76ABAE] p-5">
@@ -294,15 +306,15 @@ interface Question {
       }
     }
   
-    if (acabou) {
+    if (acabou && data) {
       return (
         <div className="px-80 w-full min-w-screen h-full min-h-screen h-full w-full bg-comp_default flex justify-center">
           <main className="w-full h-80 mb-32 flex flex-col items-start justify-between gap-3 bg-[#bcc2b8] p-5">
             <h1 className="text-center font-bold text-4xl">Estatisticas: </h1>
-            <h1 className="text-center font-bold text-4xl">Overall: {Math.floor((resultado.totalAcertos / data.questions.length) * 100)}%</h1>
-            <span className="self-start font-bold">Total de questões: {data.questions.length}</span>
+            <h1 className="text-center font-bold text-4xl">Overall: {Math.floor((resultado.totalAcertos / data[0].questions.length) * 100)}%</h1>
+            <span className="self-start font-bold">Total de questões: {data[0].questions.length}</span>
             <span className="self-start font-bold">Total acertos: {resultado.totalAcertos}</span>
-            <span className="self-start font-bold">Erros: {data.questions.length - resultado.totalAcertos}</span>
+            <span className="self-start font-bold">Erros: {data[0].questions.length - resultado.totalAcertos}</span>
             <span className="self-start font-bold">Vencedores: </span>
             <ol>
               {vencedores ? vencedores.map((e, index) => <li key={index} className="self-start">{index + 1}º Lugar: {e.nome}, Pontuação: {e.score} </li>)
@@ -311,7 +323,7 @@ interface Question {
           </main>
         </div>
       );
-    } else {
+    } else if (data) {
       return (
         <div className="px-80 w-full min-w-screen h-full min-h-screen h-full w-full bg-comp_default flex flex-col justify-center">
           <main className="w-full h-80 mb-32 flex items-center justify-between gap-10">
@@ -332,7 +344,7 @@ interface Question {
             <div className=" bg-[#bcc2b8] h-full flex flex-col gap-2 justify-center items-center px-10">
               <span className="self-start font-bold">Acertos: {resultado.totalAcertos}</span>
               <h1 className="text-center font-bold text-4xl">{atual?.question}</h1>
-              <span className="self-start">{questaoAtiva + 1}/{data.questions.length}</span>
+              <span className="self-start">{questaoAtiva + 1}/{data[0].questions.length}</span>
             </div>
             <div className="flex flex-col">
               <Chat />

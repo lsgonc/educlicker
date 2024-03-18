@@ -8,11 +8,10 @@ export const revalidate = 0
 
 export async function POST(req:NextRequest)
 {
-    let {id, author, questions} = await req.json()
+    let {author, questions} = await req.json()
 
    const quizData = await prisma.quizzes.create({
         data:{
-            id: id,
             dataCriacao: new Date(),
             autor: author,
             questions: questions

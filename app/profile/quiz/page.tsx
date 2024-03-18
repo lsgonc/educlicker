@@ -78,6 +78,7 @@ export default function Page()
     
     if(error) return <h1>Ocorreu um erro</h1>
     if(!data) return <h1>Loading</h1>
+    if(!session) return (router.push("/"))
 
    
     return(

@@ -1,134 +1,149 @@
 "use client"
+import {Schema, ZodError, ZodIssue, z} from "zod"
 import { useSession } from "next-auth/react";
-import { ChangeEvent, ChangeEventHandler, FormEvent, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, FormEvent, Fragment, useEffect, useState } from "react";
+import {SubmitHandler, useFieldArray, useForm} from "react-hook-form"
+import { useRouter } from "next/navigation";
 
 
-interface initialQuestion {
-    id: number,
-    question: string,
-    respostaCorreta: string,
-    respostas: string[] 
+type FormTypes = {
+    quizData: {
+        id: number,
+        question: string,
+        respostaCorreta: string,
+        respostas: string[]
+    }[]
+    
 }
-
-type Questions = initialQuestion[];
 
 export default function Page() {
     
     const {data: session, status} = useSession() //pra verificar se o usuario ta logado
+    const router = useRouter()
     const [nextId, setNextId] = useState<number>(1);
 
-    const initialQuestion : initialQuestion = {
-        id: nextId,
-        question: '',
-        respostaCorreta: '',
-        respostas: ['','',''] // Initialize with three empty strings
-    };
+    const { register, control, handleSubmit, formState: {errors, isSubmitting,  isSubmitSuccessful}, reset } = useForm<FormTypes>(
+        {
+            defaultValues: {
+                quizData: [{
+                    id: 0,
+                    question: "",
+                    respostaCorreta: "",
+                    respostas: ["","",""]
+                }]
+            }
+        }
+    )
 
-    const [questions, setQuestions] = useState<Questions>([initialQuestion]);
 
-    const handleChange = (e:ChangeEvent<HTMLInputElement>, index:number) => {
-        const { name, value } = e.target;
-        const updatedQuestions = [...questions as any];
-        const propName = name as keyof initialQuestion;
-        updatedQuestions[index][propName]  = value;
-        setQuestions(updatedQuestions);
-    };
 
-    const handleWrongAnswerChange = (index:number, subIndex:number, value: any) => {
-        const updatedQuestions = [...questions];
-        updatedQuestions[index].respostas[subIndex] = value;
-        setQuestions(updatedQuestions);
-    };
+    const { fields, append, prepend, remove } = useFieldArray({
+        name: "quizData",
+        control
+    })
 
-    const addQuestion = () => {
-        setNextId((e) => e+1)
-        setQuestions([...questions, { ...initialQuestion, id: nextId }]);    
-    };
 
-    const removeQuestion = (index:number) => {
-        const updatedQuestions = [...questions];
-        updatedQuestions.splice(index, 1);
-        setQuestions(updatedQuestions);
-    };
 
-    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const sendSubmit:SubmitHandler<FormTypes> = async (data) => {
 
-        const updatedQuestions = questions.map(question => ({
-            ...question,
-            respostas: [...question.respostas, question.respostaCorreta]
-        }));
-        
-        // Here you can handle form submission, e.g., send the data to a server
-        const res = await fetch("/api/prisma/createQuiz", {
-            method: "POST",
-            body: JSON.stringify({author: session?.user?.name, questions: updatedQuestions})
+        data.quizData.forEach((e,index) => {
+            e.id = index+1
+            e.respostas.push(e.respostaCorreta)
         })
 
-        const ver = await res.json()
+        console.log(data)
+        
 
-        setQuestions([initialQuestion])
+        try {
+            const res = await fetch("/api/prisma/createQuiz", {
+                method: "POST",
+                body: JSON.stringify({author: session?.user?.name, questions: data.quizData})
+            })
+    
+            const ver = await res.json()
+        } catch (error : any) {
+            console.log(error)
+        }
+        
     };
+
+    useEffect(() => {
+        if(isSubmitSuccessful){
+            reset()
+            alert("Quiz criado com sucesso!")
+        }
+    },[isSubmitSuccessful])
+
 
     if(session){
         return (
-            <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
+            <div className="bg-[#76ABAE] w-screen h-screen">
+            <div className="w-1/2 mx-auto bg-white rounded-lg shadow-md p-8">
                 <h2 className="text-2xl font-bold mb-4">Criar Quizz - <span className="font-normal italic">{session.user?.name}</span></h2>
-                <form onSubmit={handleSubmit}>
-                    {questions.map((question, index) => (
-                        <div key={index} className="mb-8">
-                            <div className="mb-4">
-                                <label htmlFor={`question-${index}`} className="block text-gray-700 font-semibold mb-2">Pergunta {index + 1}</label>
-                                <input
-                                    type="text"
-                                    id={`question-${index}`}
-                                    name="question"
-                                    placeholder="Qual a capital do Brasil?"
-                                    value={question.question}
-                                    onChange={(e) => handleChange(e, index)}
-                                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div className="mb-4">
-                                <label htmlFor={`respostaCorreta-${index}`} className="block text-gray-700 font-semibold mb-2">Resposta correta</label>
-                                <input
-                                    type="text"
-                                    id={`respostaCorreta-${index}`}
-                                    name="respostaCorreta"
-                                    placeholder="Brasília"
-                                    value={question.respostaCorreta}
-                                    onChange={(e) => handleChange(e, index)}
-                                    className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:border-blue-500"
-                                />
-                            </div>
-                            <div className="mb-6">
-                                <label className="block text-gray-700 font-semibold mb-2">Respostas erradas</label>
-                                {question.respostas.map((answer, subIndex) => (
-                                    <input
-                                        key={subIndex}
-                                        type="text"
-                                        placeholder={`Resposta errada ${subIndex + 1}`}
-                                        value={answer}
-                                        onChange={(e) => handleWrongAnswerChange(index, subIndex, e.target.value)}
-                                        className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:border-blue-500 mb-2"
-                                    />
-                                ))}
-                            </div>
-                            <div className="flex gap-2">
-                                <button type="button" onClick={() => removeQuestion(index)} className="text-red">Remove Question</button>
-                                <button type="button" onClick={addQuestion} className="text-green">Add Question</button>
-                            </div>
-                            
-                        </div>
-                    ))}
-                    <div className="text-center">
-                        
-                        <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none ml-4">Submit</button>
-                    </div>
-                </form>
+                <form className="grid grid-cols-2 gap-4" onSubmit={handleSubmit(sendSubmit)}>
+                    {
+                        fields.map((field,index) => {
+                            return (
+                                <Fragment key={field.id}>
+                                 <div className="col-span-2">
+                                    <input  {...register(`quizData.${index}.question`, {
+                                        required: "Digite uma questão",
+                                        minLength: {
+                                            value: 6,
+                                            message: "A questão deve ter no mínimo 6 caractéres"
+                                        }
+                                    })} className=" w-full text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3" type="text" placeholder={`Questão ${index+1}`}/>
+                                    {errors.quizData?.[index]?.question?.message && <div className="text-red">{errors.quizData[index]?.question?.message}</div>}
+                                    </div>
+
+                                    <div>
+                                    <input {...register(`quizData.${index}.respostaCorreta`, {
+                                        required: "Digite a resposta correta"
+                                    })} className="w-full text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3" type="text" placeholder="Resposta Correta"/>
+                                    {errors.quizData?.[index]?.respostaCorreta?.message && <div className="text-red">{errors.quizData[index]?.respostaCorreta?.message}</div>}
+                                    </div>
+
+                                    <div>
+                                    <input {...register(`quizData.${index}.respostas.${0}`, {
+                                        required: "Digite as respostas"
+                                    })} className="w-full text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3" type="text" placeholder="Resposta 1"/>
+                                     {errors.quizData?.[index]?.respostas?.[0]?.message && <div className="text-red">{errors.quizData?.[index]?.respostas?.[0]?.message}</div>}
+                                    </div>
+
+                                    <div>
+                                    <input {...register(`quizData.${index}.respostas.${1}`, {
+                                        required: "Digite as respostas"
+                                    })} className="w-full text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3" type="text" placeholder="Resposta 2"/>
+                                    {errors.quizData?.[index]?.respostas?.[1]?.message && <div className="text-red">{errors.quizData?.[index]?.respostas?.[1]?.message}</div>}
+                                    </div>
+
+                                    <div>
+                                    <input {...register(`quizData.${index}.respostas.${2}`, {
+                                        required: "Digite as respostas"
+                                    })} className="w-full text-black focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3" type="text" placeholder="Resposta 3"/>
+                                    {errors.quizData?.[index]?.respostas?.[2]?.message && <div className="text-red">{errors.quizData?.[index]?.respostas?.[2]?.message}</div>}
+                                    </div>
+                                    <button className="h-[40px] bg-green rounded-md" onClick={() => append({
+                                        id: 0,
+                                        question: "",
+                                        respostaCorreta: "",
+                                        respostas: ["","",""]
+                                    })}>Adicionar questão</button>  
+                                    <button className="h-[40px] bg-red rounded-md" onClick={() => remove(index)}>Remover questão</button>  
+                                    </Fragment>
+                                            )
+                                        })
+                                    }
+                        <button className="text-white col-span-2 h-[40px] rounded-md bg-[#31363F]" type="submit">
+                            {isSubmitting ? "Enviando..." : "Criar Quiz"}
+                        </button>
+                </form>   
+            </div>
             </div>
         );
     } else {
-        return (<h1>VOCE PRECISA ESTAR LOGADO PARA CRIAR UM QUIZZ</h1>)
+        return (
+            router.push("/")
+        )
     }
 }
