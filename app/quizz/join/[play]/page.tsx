@@ -359,4 +359,6 @@ interface Question {
         </div>
       );
     }
+
+    return (<h1>Erro</h1>)
   }
