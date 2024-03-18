@@ -5,9 +5,14 @@ import NextAuth from "next-auth"
 import GithubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google";
 
+
+console.log("GITHUB_ID GITHUB_SECRET", process.env.NEXTAUTH_GITHUB_ID , process.env.NEXTAUTH_GITHUB_SECRET)
+
 const handler = NextAuth({
+    
     providers: [
         GithubProvider({
+            
             clientId: process.env.NEXTAUTH_GITHUB_ID as string,
             clientSecret: process.env.NEXTAUTH_GITHUB_SECRET as string,
         })
