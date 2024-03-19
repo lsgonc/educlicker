@@ -9,16 +9,23 @@ export const revalidate = 0
 export async function POST(req:NextRequest)
 {
     let {author, questions} = await req.json()
-
-   const quizData = await prisma.quizzes.create({
-        data:{
-            dataCriacao: new Date(),
-            autor: author,
-            questions: questions
-        }
-   })
+    
+    try{
+        const quizData = await prisma.quizzes.create({
+                data:{
+                    dataCriacao: new Date(),
+                    autor: author,
+                    questions: questions
+                }
+        })
+        return Response.json({msg: "Quizz criado com sucesso"})
+    } catch (e)
+    {
+        console.log("Erro ao criar quiz", e)
+        Response.json({error: "Nao foi possivel criar o Quiz"})
+    }
 
     
-    return Response.json({msg: "Quizz criado com sucesso"})
+    
 
 }
