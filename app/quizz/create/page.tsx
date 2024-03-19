@@ -55,7 +55,7 @@ export default function Page() {
         
 
         try {
-            const res = await fetch(`api/prisma/createQuiz`, {
+            const res = await fetch(`/api/prisma/createQuiz`, {
                 method: "POST",
                 body: JSON.stringify({author: session?.user?.name, questions: data.quizData})
             })
