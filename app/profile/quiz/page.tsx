@@ -39,7 +39,9 @@ export default function Page()
 
 
     useEffect(() => {
-        socket = io("https://educlicker-websocket-latest.onrender.com:8080")
+        socket = io("https://educlicker-websocket-latest.onrender.com", {
+            secure: true
+        })
 
         
         return (() => {
@@ -77,7 +79,6 @@ export default function Page()
 
     function handleCreate(e: any, id: string) {
         e.preventDefault()
-        console.log(id)
         setButtonClicked((e) => id)
         socket.emit("create_game", {host: hostA,gameUrl: id})
     }
@@ -122,7 +123,6 @@ export default function Page()
                         {
                             data.map( (i : quizzes, index: number) => (
                                 <>
-                                {console.log(`i[${index}] = `,i)}
                                 <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow">
                                     <a href="#">
                                         <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">{i.titulo}</h5>

@@ -39,7 +39,7 @@ interface Question {
   let socket: Socket | undefined;
   
   async function fetcher(id: string): Promise<QuizData> {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL}/api/prisma/getQuiz/`, {
+    const res = await fetch(`/api/prisma/joinQuiz/`, {
       method: "POST",
       body: JSON.stringify({ id: id })
     });
@@ -92,7 +92,9 @@ interface Question {
     if (session) user = session.user?.name as string;
   
     useEffect(() => {
-      socket = io("https://educlicker-websocket-latest.onrender.com:8080");
+      socket = io("https://educlicker-websocket-latest.onrender.com", {
+        secure: true
+      });
   
       socket.emit("join_game", { roomId: gamePin, nickname: user });
   
