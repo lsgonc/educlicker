@@ -11,7 +11,7 @@ services:
     - key: NEXTAUTH_URL
       sync: false
     - key: NEXTAUTH_SECRET
-      sync: fase
+      sync: false
     - key: DATABASE_URL
       value: mongodb+srv://LuCaSjjgg:lucas@learningmongo.pfhsjsb.mongodb.net/educlicker
 
