@@ -39,7 +39,7 @@ export default function Page()
 
 
     useEffect(() => {
-        socket = io("http://localhost:8080")
+        socket = io("https://educlicker-websocket-latest.onrender.com:8080")
 
         
         return (() => {

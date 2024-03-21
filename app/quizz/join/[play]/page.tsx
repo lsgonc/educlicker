@@ -92,7 +92,7 @@ interface Question {
     if (session) user = session.user?.name as string;
   
     useEffect(() => {
-      socket = io("http://localhost:8080");
+      socket = io("https://educlicker-websocket-latest.onrender.com:8080");
   
       socket.emit("join_game", { roomId: gamePin, nickname: user });
   
