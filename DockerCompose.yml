@@ -1,0 +1,13 @@
+version: '3.1'
+
+services:
+  educlicker:
+    image: educlicker-docker
+    ports:
+      - 3000:3000
+    env_file:
+      - ./.env.production
+  websocket: 
+    image: educlicker-websocket
+    ports:
+      - 8080:8080

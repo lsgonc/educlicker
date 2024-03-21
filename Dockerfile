@@ -1,4 +1,4 @@
-FROM node:alpine AS base
+FROM node:18-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -18,19 +18,6 @@ RUN \
 
 # Rebuild the source code only when needed
 FROM base AS builder
-
-ENV DATABASE_URL="mongodb+srv://LuCaSjjgg:lucas@learningmongo.pfhsjsb.mongodb.net/educlicker"
-
-
-ARG NEXT_PUBLIC_PUSHER_APP_ID=1762437
-ARG NEXT_PUBLIC_PUSHER_SECRET=0bd3a57a770e59c32870
-ARG NEXT_PUBLIC_PUSHER_KEY=bb855a20dd0049e18316
-ARG NEXT_PUBLIC_PUSHER_CLUSTER=us2
-ARG NEXT_PUBLIC_GITHUB_ID=d94ef0b027b86b9883c9
-ARG NEXT_PUBLIC_GITHUB_SECRET=db83d4c55102a0b442c471c6d8cac56793bb191d
-ARG NEXT_PUBLIC_NEXTAUTH_SECRET=RAHxu/7g/RKkhjtpTVv02kxPe5F+eHD0qU4MDXPcp9w=
-ARG NEXTAUTH_URL=http://localhost:3000/
-ARG NEXT_PUBLIC_ABLY_API_KEY=PjTPpw.ZU3NlA:I7g4Jqukmg3mfG7JhbPeF0y69VC88K5P1wRheHASq38
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
@@ -76,7 +63,7 @@ EXPOSE 3000
 
 ENV PORT 3000
 # set hostname to localhost
-ENV HOSTNAME "localhost"
+ENV HOSTNAME "0.0.0.0"
 
 # server.js is created by next build from the standalone output
 # https://nextjs.org/docs/pages/api-reference/next-config-js/output

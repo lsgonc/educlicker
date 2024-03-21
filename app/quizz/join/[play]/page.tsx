@@ -20,7 +20,7 @@ interface Question {
   }
   
   interface QuizData extends Array<QuizData>{
-    autor: string,
+    titulo: string
     dataCriacao: Date,
     id: string;
     questions: Question[];

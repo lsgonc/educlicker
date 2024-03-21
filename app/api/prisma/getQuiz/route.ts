@@ -7,41 +7,66 @@ export const revalidate = 1
 
 export async function GET()
 {
+
     const session = await getServerSession()
 
-    if(session) {
-        if(session.user!.name){
-            const quizzData = await prisma.quizzes.findMany({
-                where: {
-                    autor: session.user?.name
-                }
-            })
-            let res = Response.json(quizzData)
-        
-            //Para garantir que o next chame sempre o GET sem usar o SWR
-            res.headers.set("Cache-Control", "s-maxage=1, stale-while-revalidate") 
-
-            return res
-        }
-
-        
+    if(!session)
+    {
+        return Response.json({message: "Não autorizado"},{status: 401}) 
     }
-    
-    return Response.json({message: "Voce precisa estar logado!"})
+
+    try {
+        const quizAutor = await prisma.user.findUnique({
+            where: {
+                email: session.user?.email as string
+            }
+        })
+
+        const quizzData = await prisma.quizzes.findMany({
+            where: {
+                userId: quizAutor!.id
+            }
+        })
+
+        return Response.json(quizzData)
+    } catch(e)
+    {
+        Response.json({message: e},{status: 500})
+    }
+
+
+    return 
 }
 
 export async function POST(req : any)
 {
+    const session = await getServerSession()
+
+    if(!session)
+    {
+        return Response.json({message: "Não autorizado"},{status: 401}) 
+    }
+
     const body = await req.json()
     
-    console.log(body.id)
+    try{
+        const quizAutor = await prisma.user.findUnique({
+            where: {
+                email: session.user?.email as string
+            }
+        })
 
-    const quizzData = await prisma.quizzes.findMany({
-        where: {
-            id: body.id
-        }
-    })
+        const quizzData = await prisma.quizzes.findMany({
+            where: {
+                userId: quizAutor!.id,
+                id: body.id
+            }
+        })
 
+        return Response.json(quizzData, {status:200})
+    } catch (e)
+    {
+        return Response.json({message:e },{status:500})
+    }
 
-    return Response.json(quizzData)
 }

@@ -4,19 +4,22 @@ import NextAuth from "next-auth"
 // importing providers
 import GithubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google";
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import prisma from "../../prisma/prisma";
 
-
-console.log("GITHUB_ID GITHUB_SECRET", process.env.NEXTAUTH_GITHUB_ID , process.env.NEXTAUTH_GITHUB_SECRET)
 
 const handler = NextAuth({
-    
+    adapter: PrismaAdapter(prisma),
     providers: [
         GithubProvider({
-            
-            clientId: process.env.NEXTAUTH_GITHUB_ID as string,
-            clientSecret: process.env.NEXTAUTH_GITHUB_SECRET as string,
+            clientId: process.env.GITHUB_ID as string,
+            clientSecret: process.env.GITHUB_SECRET as string,
         })
     ],
+    session: {
+        strategy: "jwt",
+        maxAge: 30 * 24 * 60 * 60
+    },
     secret: process.env.NEXTAUTH_SECRET
 })
 

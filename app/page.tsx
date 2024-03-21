@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <>
     <Navbar />
-    <main>
+    <main className="bg-[#fff] py-3">
     <Slider />
     <Explore text="Explore"/>
     <ScrollAnimation inViewClass={"animate-fade-right animate-duration-1000"} outViewClass={""}>

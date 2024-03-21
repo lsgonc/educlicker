@@ -26,7 +26,9 @@ module.exports = {
               ]
           }
       ]
-  }
+  },
+
+  output: "standalone"
 
 
 };

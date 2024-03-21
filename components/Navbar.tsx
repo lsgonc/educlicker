@@ -13,9 +13,9 @@ export default function Navbar()
         return(
             <nav>
                 <div className="bg-[#31363F] text-white font-roboto flex items-center justify-between px-5 md:px-24 lg:px-32  py-6 mb-20   max-sm:px-5 ">
-                    <h1 className="text-4xl font-bold font-anton"><a href="">EduClicker</a></h1>
+                    <h1 className="text-4xl font-bold font-anton"><a href="/">EduClicker</a></h1>
                     <ul className="max-sm:hidden flex text-base font-normal  gap-5">
-                        <li><a className="hover:text-[#76ABAE]" href="">Home</a></li>
+                        <li><a className="hover:text-[#76ABAE]" href="/">Home</a></li>
 
                         {session ? <li><a className="hover:text-[#76ABAE]" href="/profile">Meu Perfil</a></li> : <li><a href="/login" className="hover:text-bg_default">Login</a></li> } 
                         

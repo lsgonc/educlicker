@@ -2,62 +2,79 @@
 import {Schema, ZodError, ZodIssue, z} from "zod"
 import { useSession } from "next-auth/react";
 import { ChangeEvent, ChangeEventHandler, FormEvent, Fragment, useEffect, useState } from "react";
-import {SubmitHandler, useFieldArray, useForm} from "react-hook-form"
-import { useRouter } from "next/navigation";
+import {SubmitHandler, useFieldArray, useForm, useFormContext} from "react-hook-form"
+import { useParams, useRouter, useSearchParams } from "next/navigation";
+import useSWR from "swr";
 
 
 type FormTypes = {
-    titulo: string
+    titulo: string, 
     quizData: {
         question: string,
-        respostaCorreta: string,
+        respostaCorreta: string ,
         respostas: string[]
-    }[]
-    
+    }[] | undefined
 }
 
-export default function Page() {
+
+  
+
+async function fetcher(id: string){
+    const res = await fetch(`/api/prisma/getQuiz/`, {
+        method: "POST",
+        body: JSON.stringify({ id: id })
+    });
+
+    const quizz = await res.json();
+
+    return quizz[0];
+}
+  
+
+export default function Page({params} : {params: {id: string}}) {
     
     const {data: session, status} = useSession() //pra verificar se o usuario ta logado
     const router = useRouter()
 
-    const { register, control, handleSubmit, formState: {errors, isSubmitting,  isSubmitSuccessful}, reset } = useForm<FormTypes>(
-        {
-            defaultValues: {
-                titulo: "Título - Quiz",
-                quizData: [{
-                    question: "",
-                    respostaCorreta: "",
-                    respostas: ["","",""]
-                }]
-            }
-        }
+    const {data, error, mutate} = useSWR('/api/prisma/getQuiz', () => fetcher(params.id) )  
+
+    const quizId = useParams<{edit: string}>()
+
+    useEffect(() => {
+        data?.questions?.forEach((e:any) => {
+            e.respostas.pop()
+        })
+    },[data])
+    
+
+
+    const { register, control, setValue, handleSubmit, formState: {errors, isSubmitting,  isSubmitSuccessful}, reset } = useForm<FormTypes>(
+    {
+        values: {titulo: data?.titulo || "", quizData: data?.questions}
+    }
     )
-
-
-
+    
     const { fields, append, prepend, remove } = useFieldArray({
         name: "quizData",
         control
     })
+    
 
 
 
     const sendSubmit:SubmitHandler<FormTypes> = async (data) => {
 
-        data.quizData.forEach((e,index) => {
+        data.quizData?.forEach((e,index) => {
             e.respostas.push(e.respostaCorreta)
         })
 
-        console.log(data)
-        
 
         try {
-            const res = await fetch(`/api/prisma/createQuiz`, {
-                method: "POST",
-                body: JSON.stringify({titulo: data.titulo, questions: data.quizData})
+            const res = await fetch(`/api/prisma/updateQuiz`, {
+                method: "PUT",
+                body: JSON.stringify({titulo: data.titulo, questions: data.quizData, id: quizId.edit})
             })
-        
+    
             const ver = await res.json()
         } catch (error : any) {
             console.log(error)
@@ -68,7 +85,7 @@ export default function Page() {
     useEffect(() => {
         if(isSubmitSuccessful){
             reset()
-            alert("Quiz criado com sucesso!")
+            alert("Quiz atualizado com sucesso!")
         }
     },[isSubmitSuccessful])
 
@@ -77,7 +94,7 @@ export default function Page() {
         return (
             <div className="bg-[#76ABAE] w-screen h-screen overflow-auto font-roboto">
             <div className="w-1/2 mx-auto bg-white rounded-lg shadow-md p-8">
-                <h2 className="text-3xl font-bold mb-4">Criar Quizz - <span className="font-normal italic">{session.user?.name}</span></h2>
+                <h2 className="text-3xl font-bold mb-4">Editar - <span className="font-normal italic">{session.user?.name}</span></h2>
                 <form className="grid grid-cols-2 gap-4" onSubmit={handleSubmit(sendSubmit)}>
                 <div className="col-span-2">
                         <input  {...register(`titulo`, {
@@ -143,7 +160,7 @@ export default function Page() {
                                         })
                                     }
                         <button className="text-white col-span-2 h-[40px] rounded-md bg-[#31363F]" type="submit">
-                            {isSubmitting ? "Enviando..." : "Criar Quiz"}
+                            {isSubmitting ? "Enviando..." : "Editar"}
                         </button>
                 </form>   
             </div>

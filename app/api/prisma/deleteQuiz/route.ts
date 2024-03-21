@@ -7,12 +7,18 @@ export async function DELETE(req : any)
     const searchParams = req.nextUrl.searchParams;
     const id = searchParams.get('id');
     
-    const quizzData = await prisma.quizzes.delete({
-        where: {
-            id: id
-        }
-    })
+    try{
+        const quizzData = await prisma.quizzes.delete({
+            where: {
+                id: id
+            }
+        })
+        return Response.json({msg: "Quizz deletado com sucesso!"},{status:200})
+    } catch(e)
+    {
+        return Response.json({msg: "Falha ao deletar quizz!"},{status:500})
+    }
 
 
-    return Response.json({msg: "Quizz deletado com sucesso!"})
+    
 }

@@ -9,6 +9,7 @@ export default async function Page()
 
     if(!session)
     {
+        console
         redirect("/login")
     }
  

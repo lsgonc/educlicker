@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: educlicker-nextjs
+    runtime: image
+    image: docker.io/lucasjjgg/educlicker-docker
+    envVars:
+    - key: GITHUB_ID
+      value: d94ef0b027b86b9883c9
+    - key: GITHUB_SECRET
+      sync: false
+    - key: NEXTAUTH_URL
+      sync: false
+    - key: NEXTAUTH_SECRET
+      sync: fase
+    - key: DATABASE_URL
+      value: mongodb+srv://LuCaSjjgg:lucas@learningmongo.pfhsjsb.mongodb.net/educlicker
+
+
+  - type: pserv
+    name: educlicker-websocket
+    runtime: image
+    image: docker.io/lucasjjgg/educlicker-docker

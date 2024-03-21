@@ -4,6 +4,7 @@ import "./globals.css";
 import { PostponedPathnameNormalizer } from "next/dist/server/future/normalizers/request/postponed";
 import { getServerSession } from "next-auth";
 import SessionWrapper from "@/components/SessionWraper";
+import Navbar from "@/components/Navbar";
 
 const inter = Inter({ subsets: ['latin'], variable: "--font-inter" })
 

@@ -5,7 +5,7 @@ import prisma from "@/app/api/prisma/prisma"
 import { quizzes } from "@prisma/client"
 import useSWR from "swr"
 import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
+import { MouseEvent, useEffect, useState } from "react"
 import { Socket, io } from "socket.io-client"
 
 let socket : Socket
@@ -35,6 +35,7 @@ export default function Page()
     const hostA = (session?.user?.name) ? session?.user.name : "host"
     const [gamePin, setGamePin] = useState(null)
     const [buttonClicked, setButtonClicked] = useState("")
+    const [deletar, setDeleting] = useState<boolean>(false)
 
 
     useEffect(() => {
@@ -53,9 +54,10 @@ export default function Page()
     },[buttonClicked,router])
 
 
-    async function handleSubmit(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id:string) {
+    async function handleSubmit(e: any, id:string) {
         e.preventDefault()
 
+        setDeleting((e)=>!e)
 
         const res = await fetch(`/api/prisma/deleteQuiz/?id=${id}`,{
             method: "DELETE"
@@ -63,11 +65,17 @@ export default function Page()
 
         const r = await res.json()
 
+        //Não conseguiu deletar por algum motivo => volta o botão para "Deletar"
+        if(r.status == 500)
+        {
+            setDeleting((e)=>!e)
+        }
+
         mutate()//"força" o reload da UI
 
     }
 
-    function handleCreate(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, id: string) {
+    function handleCreate(e: any, id: string) {
         e.preventDefault()
         console.log(id)
         setButtonClicked((e) => id)
@@ -81,6 +89,7 @@ export default function Page()
     if(!session) return (router.push("/"))
 
    
+
     return(
         <>
             <div className="bg-white w-full flex flex-col gap-5 px-3 md:px-16 lg:px-28 md:flex-row text-[#161931]">
@@ -116,15 +125,18 @@ export default function Page()
                                 {console.log(`i[${index}] = `,i)}
                                 <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow">
                                     <a href="#">
-                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">{i.questions[0]?.question}</h5>
+                                        <h5 className="mb-2 text-2xl font-bold tracking-tight text-gray-900">{i.titulo}</h5>
                                     </a>
-                                    <p className="mb-3 font-normal text-gray-700">{i.autor}</p>
+                                    <p className="mb-3 font-normal text-gray-700">{session.user?.name}</p>
                                     <div className="flex gap-3">
                                     <button onClick={(e) => handleCreate(e, i.id)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600">
                                     Criar sala
                                     </button>
+                                    <button onClick={() => router.push(`/quizz/editar/${i.id}`)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-[#FFC700] rounded-lg hover:bg-[#FFF455] focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                    Editar quiz
+                                    </button>
                                     <button onClick={(e) => handleSubmit(e, i.id)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-[#FE0000] rounded-lg hover:bg-bg-red focus:ring-4 focus:outline-none focus:ring-blue-300">
-                                    Deletar quizz
+                                    {deletar ? "Deletando" : "Deletar quiz"}
                                     </button>
                                     </div>
                                 </div>
