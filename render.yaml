@@ -17,7 +17,7 @@ services:
       value: mongodb+srv://LuCaSjjgg:lucas@learningmongo.pfhsjsb.mongodb.net/educlicker
 
 
-  - type: pserv
+  - type: web
     name: educlicker-websocket
     runtime: image
     image: 
