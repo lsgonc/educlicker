@@ -2,7 +2,7 @@ services:
   - type: web
     name: educlicker-nextjs
     runtime: image
-    image: docker.io/lucasjjgg/educlicker-docker
+    image: lucasjjgg/educlicker-docker
     envVars:
     - key: GITHUB_ID
       value: d94ef0b027b86b9883c9
@@ -19,4 +19,4 @@ services:
   - type: pserv
     name: educlicker-websocket
     runtime: image
-    image: docker.io/lucasjjgg/educlicker-docker
+    image: lucasjjgg/educlicker-websocket
