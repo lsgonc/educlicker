@@ -59,6 +59,7 @@ export default function Page()
     async function handleSubmit(e: any, id:string) {
         e.preventDefault()
 
+        setButtonClicked(e.currentTarget.id)
         setDeleting((e)=>!e)
 
         const res = await fetch(`/api/prisma/deleteQuiz/?id=${id}`,{
@@ -130,14 +131,14 @@ export default function Page()
                                     </a>
                                     <p className="mb-3 font-normal text-gray-700">{session.user?.name}</p>
                                     <div className="flex gap-3">
-                                    <button onClick={(e) => handleCreate(e, i.id)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600">
+                                    <button id={i.id} onClick={(e) => handleCreate(e, i.id)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600">
                                     Criar sala
                                     </button>
-                                    <button onClick={() => router.push(`/quizz/editar/${i.id}`)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-[#FFC700] rounded-lg hover:bg-[#FFF455] focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                    <button id={i.id} onClick={() => router.push(`/quizz/editar/${i.id}`)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-[#FFC700] rounded-lg hover:bg-[#FFF455] focus:ring-4 focus:outline-none focus:ring-blue-300">
                                     Editar quiz
                                     </button>
-                                    <button onClick={(e) => handleSubmit(e, i.id)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-[#FE0000] rounded-lg hover:bg-bg-red focus:ring-4 focus:outline-none focus:ring-blue-300">
-                                    {deletar ? "Deletando" : "Deletar quiz"}
+                                    <button id={i.id} onClick={(e) => handleSubmit(e, i.id)} className="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-[#FE0000] rounded-lg hover:bg-bg-red focus:ring-4 focus:outline-none focus:ring-blue-300">
+                                    {deletar && i.id===buttonClicked ? "Deletando" : "Deletar quiz"}
                                     </button>
                                     </div>
                                 </div>
