@@ -121,6 +121,7 @@ export default function Page()
                         
                         <div className="flex flex-col gap-5">
                         {
+                            data ? 
                             data.map( (i : quizzes, index: number) => (
                                 <>
                                 <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow">
@@ -142,7 +143,8 @@ export default function Page()
                                 </div>
                                 </>
                             ))
-                            
+                            :
+                            null
                         }
                         </div>
                         

@@ -27,16 +27,18 @@ async function fetcher(id: string){
 
     const quizz = await res.json();
 
-    return quizz[0];
+    return quizz;
 }
   
 
-export default function Page({params} : {params: {id: string}}) {
+export default function Page({params} : {params: {edit: string}}) {
     
     const {data: session, status} = useSession() //pra verificar se o usuario ta logado
     const router = useRouter()
 
-    const {data, error, mutate} = useSWR('/api/prisma/getQuiz', () => fetcher(params.id) )  
+    const {data, error, mutate} = useSWR('/api/prisma/getQuiz', () => fetcher(params.edit), {
+        refreshInterval: 100
+    } )  
 
     const quizId = useParams<{edit: string}>()
 
@@ -44,6 +46,8 @@ export default function Page({params} : {params: {id: string}}) {
         data?.questions?.forEach((e:any) => {
             e.respostas.pop()
         })
+        setValue("titulo",data?.titulo)
+        setValue("quizData",data?.questions)
     },[data])
     
 
@@ -70,6 +74,7 @@ export default function Page({params} : {params: {id: string}}) {
 
 
         try {
+            
             const res = await fetch(`/api/prisma/updateQuiz`, {
                 method: "PUT",
                 body: JSON.stringify({titulo: data.titulo, questions: data.quizData, id: quizId.edit})

@@ -50,13 +50,15 @@ export async function POST(req : any)
     const body = await req.json()
     
     try{
+        console.log(body.id)
+
         const quizAutor = await prisma.user.findUnique({
             where: {
                 email: session.user?.email as string
             }
         })
 
-        const quizzData = await prisma.quizzes.findMany({
+        const quizzData = await prisma.quizzes.findUnique({
             where: {
                 userId: quizAutor!.id,
                 id: body.id
