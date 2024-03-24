@@ -11,7 +11,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { getServerSideProps, getStaticProps } from "next/dist/build/templates/pages";
 import { FaUser } from "react-icons/fa";
 import useSWR, { preload } from "swr";
-import Chat from "@/components/Chat";
+import { SubmitHandler, useForm } from "react-hook-form";
+import PreviousMap from "postcss/lib/previous-map";
 
 interface Question {
     question: string;
@@ -35,8 +36,18 @@ interface Question {
     gameHost: string;
     connectedPlayers: number;
   }
+
+  type formData = {
+    message: string
+} 
+
+  type chatData = {
+    message: string 
+    gamePin: string,
+    name: string,
+  }
   
-  let socket: Socket | undefined;
+  let socket: Socket;
   
   async function fetcher(id: string): Promise<QuizData> {
     const res = await fetch(`/api/prisma/joinQuiz/`, {
@@ -63,6 +74,11 @@ interface Question {
   
     const searchParam = useSearchParams();
     const gamePin = searchParam.get("quizId");
+    
+    //Chat form
+    const {register, formState: {errors}, handleSubmit } = useForm<formData>()
+    const [chatData , setChatData] = useState<chatData []>([])
+
   
     const [pinInvalido, setPinInvalido] = useState<boolean>(false);
     const [host, setHost] = useState<string | undefined>();
@@ -97,13 +113,9 @@ interface Question {
       });
   
       socket.emit("join_game", { roomId: gamePin, nickname: user });
-  
-      socket.on("joined", () => {
-        console.log("JOINEDD");
-      });
+
   
       socket.on("pin-invalido", () => {
-        console.log("pin-invalido");
         setPinInvalido(true);
       });
   
@@ -112,14 +124,11 @@ interface Question {
       });
   
       socket.on("usuario-conectado", (data: GameHost) => {
-        console.log("emitiu um evento pra sala");
-        console.log("O host desse game é: ", data.gameHost);
         setHost(data.gameHost);
         setConnectedPlayer(data.connectedPlayers);
       });
   
       socket.on("troca-questao", (res) => {
-        console.log("TROCOU DE QUESTÃO, MUDOU A KEY");
         setAtiva(res.gameActiveQuestion);
         setDisable(false);
         setResetTimer((e) => e + 1);
@@ -130,19 +139,22 @@ interface Question {
       });
   
       socket.on("quiz-terminou", (resultado: Player[]) => {
-        console.log("O quiz acabou em");
         setVencedores(resultado);
       });
   
       socket.on("update", (data) => {
-        console.log(data.gameStarted);
         setIniciar(data.gameStarted);
         setUpdate(data.gameTimer);
         setAtiva(data.gameActiveQuestion);
         setConnectedPlayer(data.connectedPlayers);
         setTimer(data.gameTimer);
-        console.log("game ta sendo uptadted");
       });
+
+      //atualiza as mensagens do chat
+      socket.on("messages", (data) => {
+        
+        setChatData(prev => [...prev, data])
+      }) 
   
       return () => {
         socket?.disconnect();
@@ -197,9 +209,13 @@ interface Question {
     useEffect(() => {
       if (acabou) socket?.emit("terminou", { nome: user, score: resultado.totalAcertos, roomId: gamePin });
     }, [acabou]);
+
+    //manda mensagem pro socket
+    const sendMessage: SubmitHandler<formData> = (data) => {
+      socket?.emit("chat-message", {message: data.message, gamePin: gamePin, name: user })
+    }
   
     function initQuiz() {
-      console.log("init quiz com pin", gamePin);
       if(data){
         socket?.emit("start-game", gamePin, data[0].questions.length);
         setIniciar(true);
@@ -349,7 +365,23 @@ interface Question {
               <span className="self-start">{questaoAtiva + 1}/{data[0].questions.length}</span>
             </div>
             <div className="flex flex-col">
-              <Chat />
+            <div className='flex flex-col items-start justify-between p-4 bg-white h-72 rounded-lg'>
+              <ul>
+                {chatData.map((e,index) => (
+                  <li key={index}><span>{e.name}:</span> {e.message}</li>
+                ))}
+              </ul>
+                <div className="self-start">
+                <form onSubmit={handleSubmit(sendMessage)} >
+                  <input
+                    {...register("message")}
+                    className='flex h-10 w-full rounded-md border border-[#e5e7eb] px-3 py-2 text-sm placeholder-[#6b7280] focus:outline-none focus:ring-2 focus:ring-[#9ca3af] disabled:cursor-not-allowed disabled:opacity-50 text-[#030712] focus-visible:ring-offset-2'
+                    placeholder="Digite sua mensagem..."
+                  ></input>
+                  <button className="inline-flex items-center justify-center rounded-md text-sm font-medium text-[#f9fafb] disabled:pointer-events-none mt-3 bg-black hover:bg-[#111827E6] h-10 px-4 py-2" type="submit">Enviar</button>
+                </form>
+                </div>
+              </div>
             </div>
           </main>
   
