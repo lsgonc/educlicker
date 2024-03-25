@@ -63,13 +63,12 @@ interface Question {
   export default function Page({
     params
   }: {
-    params: { id: string };
+    params: { play: string };
   }): JSX.Element {
     const { data, error, isLoading } = useSWR<QuizData>(
-      `/api/prisma/getQuiz/id`,
-      () => fetcher(params.id)
+      `/api/prisma/joinQuiz/id`,
+      () => fetcher(params.play)
     );
-
 
   
     const searchParam = useSearchParams();
@@ -180,7 +179,7 @@ interface Question {
   
     useEffect(() => {
       setCorreta((e) => !e);
-      if (data) setAtual(data[0].questions[questaoAtiva]);
+      if (data) setAtual(data.questions[questaoAtiva]);
     }, [questaoAtiva]);
   
     useEffect(() => {
@@ -196,7 +195,8 @@ interface Question {
     useEffect(() => {
       if (data!=undefined)
       {
-        setAtual(data[0].questions[questaoAtiva]);
+        console.log(data)
+        setAtual(data.questions[questaoAtiva]);
       }
     }, [data]);
   
@@ -217,7 +217,7 @@ interface Question {
   
     function initQuiz() {
       if(data){
-        socket?.emit("start-game", gamePin, data[0].questions.length);
+        socket?.emit("start-game", gamePin, data.questions.length);
         setIniciar(true);
         setAtiva(0);
      }
@@ -230,7 +230,7 @@ interface Question {
       setSelectedId(e.currentTarget.id);
       
       if(data)
-        if (questaoAtiva === (data[0].questions.length ?? 0)) setAtiva(0);
+        if (questaoAtiva === (data.questions.length ?? 0)) setAtiva(0);
   
       setChoice(e.currentTarget.id);
     }
@@ -329,10 +329,10 @@ interface Question {
         <div className="px-80 w-full min-w-screen h-full min-h-screen h-full w-full bg-comp_default flex justify-center">
           <main className="w-full h-80 mb-32 flex flex-col items-start justify-between gap-3 bg-[#bcc2b8] p-5">
             <h1 className="text-center font-bold text-4xl">Estatisticas: </h1>
-            <h1 className="text-center font-bold text-4xl">Overall: {Math.floor((resultado.totalAcertos / data[0].questions.length) * 100)}%</h1>
-            <span className="self-start font-bold">Total de questões: {data[0].questions.length}</span>
+            <h1 className="text-center font-bold text-4xl">Overall: {Math.floor((resultado.totalAcertos / data.questions.length) * 100)}%</h1>
+            <span className="self-start font-bold">Total de questões: {data.questions.length}</span>
             <span className="self-start font-bold">Total acertos: {resultado.totalAcertos}</span>
-            <span className="self-start font-bold">Erros: {data[0].questions.length - resultado.totalAcertos}</span>
+            <span className="self-start font-bold">Erros: {data.questions.length - resultado.totalAcertos}</span>
             <span className="self-start font-bold">Vencedores: </span>
             <ol>
               {vencedores ? vencedores.map((e, index) => <li key={index} className="self-start">{index + 1}º Lugar: {e.nome}, Pontuação: {e.score} </li>)
@@ -362,7 +362,7 @@ interface Question {
             <div className=" bg-[#bcc2b8] h-full flex flex-col gap-2 justify-center items-center px-10">
               <span className="self-start font-bold">Acertos: {resultado.totalAcertos}</span>
               <h1 className="text-center font-bold text-4xl">{atual?.question}</h1>
-              <span className="self-start">{questaoAtiva + 1}/{data[0].questions.length}</span>
+              <span className="self-start">{questaoAtiva + 1}/{data.questions.length}</span>
             </div>
             <div className="flex flex-col">
             <div className='flex flex-col items-start justify-between p-4 bg-white h-72 rounded-lg'>

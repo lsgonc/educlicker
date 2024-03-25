@@ -4,10 +4,10 @@ import prisma from "../prisma"
 export async function POST(req : any)
 {
     const body = await req.json()
-    
+
     try{
 
-        const quizzData = await prisma.quizzes.findMany({
+        const quizzData = await prisma.quizzes.findUnique({
             where: {
                 id: body.id
             }
