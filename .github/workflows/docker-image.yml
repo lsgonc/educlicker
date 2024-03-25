@@ -31,8 +31,8 @@ jobs:
         file: ./Dockerfile
         push: true
         tags:
-          ${{env.REGISTRY}}/lucasjjgg/educlicker-docker:${{github.run_number}}
-          ${{env.REGISTRY}}/lucasjjgg/educlicker-docker:latest
+          lucasjjgg/educlicker-docker:${{github.run_number}}
+          lucasjjgg/educlicker-docker:latest
       
 
 
