@@ -28,8 +28,8 @@ jobs:
         file: ./Dockerfile
         push: true
         tags:
-          lucasjjgg/educlicker-docker:v1
-          lucasjjgg/educlicker-docker:latest
+          ${{secrets.DOCKERHUB_USER}}/educlicker-docker:${{github.run_number}}
+          ${{secrets.DOCKERHUB_USER}}/educlicker-docker:latest
       
 
 
