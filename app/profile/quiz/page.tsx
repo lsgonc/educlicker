@@ -2,7 +2,6 @@
 import { getServerSession } from "next-auth"
 import { useSession } from "next-auth/react"
 import prisma from "@/app/api/prisma/prisma"
-import { quizzes } from "@prisma/client"
 import useSWR from "swr"
 import { useRouter } from "next/navigation"
 import { MouseEvent, useEffect, useState } from "react"
@@ -123,7 +122,7 @@ export default function Page()
                         <div className="flex flex-col gap-5">
                         {
                             data ? 
-                            data.map( (i : quizzes, index: number) => (
+                            data.map( (i : any, index: number) => (
                                 <>
                                 <div className="max-w-sm p-6 bg-white border border-gray-200 rounded-lg shadow">
                                     <a href="#">
