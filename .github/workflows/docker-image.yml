@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4.1.2
       
     - uses: docker/build-push-action@v5.3.0
 
@@ -30,6 +30,8 @@ jobs:
     - name: Build and Push the Docker Image
       uses: docker/build-push-action@v5.3.0
       with:
+        context: .
+        file: ./Dockerfile
         push: true
         tags:
           lucasjjgg/educlicker-docker:${{github.run_number}}
