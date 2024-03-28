@@ -1,5 +1,8 @@
 name: Docker Image CI
 
+env:
+  REGISTRY: registry.hub.docker.com
+
 on:
   push:
     branches: [ "main" ]
@@ -28,7 +31,7 @@ jobs:
         file: ./Dockerfile
         push: true
         tags:
-          lucasjjgg/educlicker-docker:v1
+          lucasjjgg/educlicker-docker:${{github.run_number}}
           lucasjjgg/educlicker-docker:latest
       
 
