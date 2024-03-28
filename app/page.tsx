@@ -8,6 +8,7 @@ import Image from "next/image";
 import Link from "next/link";
 import ScrollAnimation from "@/components/ScrollAnimation";
 import Card from "@/components/Card";
+import JoinForm from "@/components/JoinForm";
 
 export default function Home() {
   return (
@@ -29,12 +30,7 @@ export default function Home() {
     <ScrollAnimation inViewClass={"animate-fade-left animate-duration-1000"} outViewClass={""}>
     <div className="font-roboto max-sm:flex-col max-sm:items-start flex md:mx-40 bg-comp_default rounded-md my-20 py-8 justify-between items-center px-10 sm:px-20">
       <h2 className="font-bold">Entrar em uma sala? Digite o PIN</h2>
-      <form  className="max-sm:flex-col flex gap-6" action="">
-        <input placeholder={"Digite o PIN"} className="focus:outline-none border-2 focus:ring-[#76ABAE] focus:border-[#76ABAE]  rounded-lg p-3 " type="text" name="" id="" />
-        <button type="submit" className="hover:animate-jump hover:animate-once hover:animate-duration-1000 relative flex h-[50px] w-40 items-center rounded-md justify-center overflow-hidden bg-[#31363F] text-white shadow transition-all before:absolute before:h-0 before:w-0 before:rounded-full before:bg-bg_dark before:duration-500 before:ease-out hover:shadow-bg_dark hover:before:h-56 hover:before:w-56">
-        <span className="relative z-10">Entrar na sala</span>
-        </button>
-      </form>
+      <JoinForm></JoinForm>
     </div> 
     </ScrollAnimation>
     </main>

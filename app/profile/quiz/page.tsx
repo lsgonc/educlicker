@@ -25,7 +25,7 @@ export default function Page()
 {
 
     //SWR => stale-while-revalidade => hook pra fazer o fetch dos dados na API e atualizar a UI
-    const {data, error, mutate} = useSWR('/api/prisma/getQuiz', fetcher) 
+    const {data, error, mutate} = useSWR('/api/prisma/getQuiz', fetcher, {suspense: true}) 
     const {data: session, status} = useSession()
 
 

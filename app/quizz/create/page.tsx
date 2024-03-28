@@ -49,7 +49,6 @@ export default function Page() {
             e.respostas.push(e.respostaCorreta)
         })
 
-        console.log(data)
         
 
         try {
